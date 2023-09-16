@@ -9,7 +9,7 @@ const App = () => {
   const [selectedCategory, setSelectedCategory] = useState(""); // 선택한 카테고리
   const [newCategory, setNewCategory] = useState(""); // 새 카테고리 이름
   const [newCategoryUrls, setNewCategoryUrls] = useState(""); // 새 카테고리의 URL들
-
+  const [isButtonExpanded, setIsButtonExpanded] = useState(false);
   useEffect(() => {
     // 크롬 스토리지에서 데이터를 가져와서 categories 상태를 초기화합니다.
     chrome.storage.sync.get(["categories"], (result) => {
@@ -119,6 +119,7 @@ const App = () => {
           onChange={(e) => setNewCategoryUrls(e.target.value)}
         />
       </div>
+
       <Button type="primary" onClick={handleAddCategory}>
         카테고리 추가
       </Button>
