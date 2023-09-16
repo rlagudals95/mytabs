@@ -30,7 +30,23 @@ export default defineConfig({
     },
   },
   plugins: [
-    react(),
+    react({
+      // JSX 컴파일 시 기본 jsx-runtime 대신 Emotion의 jsx 함수를 사용하도록 설정
+      // JSX에서 css prop을 사용하기 위함
+      jsxImportSource: "@emotion/react",
+      // 커스텀 바벨 설정: @emotion-babel-plugin 플러그인 추가
+      babel: {
+        plugins: [
+          [
+            "@emotion/babel-plugin",
+            {
+              autoLabel: "dev-only",
+              labelFormat: "[dirname]--[filename]--[local]___",
+            },
+          ],
+        ],
+      },
+    }),
     makeManifest(manifest, {
       isDev,
       contentScriptCssKey: regenerateCacheInvalidationKey(),
@@ -47,6 +63,12 @@ export default defineConfig({
     minify: isProduction,
     reportCompressedSize: isProduction,
     rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
+          return;
+        }
+        warn(warning);
+      },
       input: {
         devtools: resolve(pagesDir, "devtools", "index.html"),
         panel: resolve(pagesDir, "panel", "index.html"),

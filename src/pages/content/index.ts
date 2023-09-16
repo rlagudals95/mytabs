@@ -1,4 +1,4 @@
-console.log("content loaded");
+console.log("mytabs content loaded");
 
 /**
  * @description
