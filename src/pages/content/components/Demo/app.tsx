@@ -1,20 +1,34 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styled from "@emotion/styled";
 import { Input, Button, Select, Modal } from "antd";
+import { MenuTitle } from "./MenuTitle";
+import { css } from "@emotion/react";
+import { ImageSquare } from "./ImageSqaure";
+import { CategoryAddForm } from "../app/CategoryAddForm";
+import { staticUrlOrigin } from "@root/src/shared/constants/url";
+import { CategoryEditForm } from "../app/CategoryEditForm";
 
 const { Option } = Select;
 
+export type Category = {
+  name: string;
+  urls: string[];
+};
+
 const App = () => {
-  const [categories, setCategories] = useState([]); // 사용자가 등록한 카테고리 리스트
+  const [categories, setCategories] = useState<Category[]>([]); // 사용자가 등록한 카테고리 리스트
   const [selectedCategory, setSelectedCategory] = useState(""); // 선택한 카테고리
   const [newCategory, setNewCategory] = useState(""); // 새 카테고리 이름
   const [newCategoryUrls, setNewCategoryUrls] = useState(""); // 새 카테고리의 URL들
   const [isButtonExpanded, setIsButtonExpanded] = useState(false);
+
   useEffect(() => {
     // 크롬 스토리지에서 데이터를 가져와서 categories 상태를 초기화합니다.
     chrome.storage.sync.get(["categories"], (result) => {
       if (result.categories) {
         setCategories(result.categories);
+
+        console.log("result.categories :", result.categories);
       }
     });
   }, []);
@@ -63,7 +77,7 @@ const App = () => {
     });
   };
 
-  const handleEditCategory = (categoryName) => {
+  const handleEditCategory = (categoryName: string) => {
     const selectedCategoryData = categories.find(
       (category) => category.name === categoryName
     );
@@ -88,9 +102,9 @@ const App = () => {
     const updatedCategories = categories.map((category) =>
       category.name === categoryName
         ? {
-          name: newCategoryName,
-          urls: newCategoryUrls.split(",").map((url) => url.trim()),
-        }
+            name: newCategoryName,
+            urls: newCategoryUrls.split(",").map((url) => url.trim()),
+          }
         : category
     );
 
@@ -100,67 +114,119 @@ const App = () => {
     chrome.storage.sync.set({ categories: updatedCategories });
   };
 
+  const [showCaregoryAddForm, setShowCaregoryAddForm] = useState(false);
+  const [showCaregoryEditForm, setShowCaregoryEditForm] = useState(true);
+
+  const handleClickToggleShowCaregoryAddForm = useCallback(() => {
+    setShowCaregoryAddForm(!showCaregoryAddForm);
+  }, [showCaregoryAddForm]);
+
+  const handleClickToggleShowCaregoryEditForm = useCallback(() => {
+    setShowCaregoryEditForm(!showCaregoryEditForm);
+  }, [showCaregoryEditForm]);
+
   return (
     <Wrapper>
-      <h1>카테고리 탭 열기</h1>
-      <div>
-        <label htmlFor="categoryName">새 카테고리 이름:</label>
-        <Input
-          id="categoryName"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="categoryUrls">카테고리 URL들 (쉼표로 구분):</label>
-        <Input.TextArea
-          id="categoryUrls"
-          value={newCategoryUrls}
-          onChange={(e) => setNewCategoryUrls(e.target.value)}
-        />
-      </div>
+      <Body>
+        <TitleWrapper>
+          <MenuTitle>카테고리 추가</MenuTitle>
+          <ImageSquare
+            src={`${staticUrlOrigin}/olaf/assets/images/toggle_down.svg`}
+            width="2.2rem"
+            styles={css`
+              cursor: pointer;
+              transition: 0.2s;
+              transform: rotate(${showCaregoryAddForm ? 0 : 180}deg);
+            `}
+            onClick={handleClickToggleShowCaregoryAddForm}
+          />
+        </TitleWrapper>
+        {showCaregoryAddForm && (
+          <CategoryAddForm
+            newCategory={newCategory}
+            setNewCategory={setNewCategory}
+            newCategoryUrls={newCategoryUrls}
+            setNewCategoryUrls={handleAddCategory}
+            handleAddCategory={handleAddCategory}
+          />
+        )}
 
-      <Button type="primary" onClick={handleAddCategory}>
-        카테고리 추가
-      </Button>
-      <hr />
-      <h2>카테고리 목록</h2>
-      <Select
-        defaultValue=""
-        style={{ width: "100%" }}
-        onChange={(value) => setSelectedCategory(value)}
-      >
-        <Option value="">카테고리 선택</Option>
-        {categories.map((category) => (
-          <div key={category.name}>
-            <Option value={category.name}>{category.name}</Option>
-            <Button onClick={() => handleEditCategory(category.name)}>
-              수정
-            </Button>
-            <Button onClick={() => handleDeleteCategory(category.name)}>
-              삭제
-            </Button>
-          </div>
-        ))}
-      </Select>
-      <Button onClick={handleOpenTabs}>탭 열기</Button>
+        <hr />
+        <TitleWrapper>
+          <MenuTitle>카테고리 목록</MenuTitle>
+          <ImageSquare
+            src={`${staticUrlOrigin}/olaf/assets/images/toggle_down.svg`}
+            width="2.2rem"
+            styles={css`
+              cursor: pointer;
+              transition: 0.2s;
+              transform: rotate(${showCaregoryEditForm ? 0 : 180}deg);
+            `}
+            onClick={handleClickToggleShowCaregoryEditForm}
+          />
+        </TitleWrapper>
+
+        {showCaregoryEditForm && (
+          <CategoryEditForm
+            categories={categories}
+            handleEditCategory={handleEditCategory}
+            handleDeleteCategory={handleDeleteCategory}
+          />
+        )}
+
+        <Button onClick={handleOpenTabs}>탭 열기</Button>
+      </Body>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
   background: #fff;
-  width: 200px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
   position: fixed;
   top: 50px;
   right: 50px;
-  z-index: 9999999;
+  z-index: 9999;
   padding: 1rem;
   border-radius: 0.5rem;
   font-weight: 500;
   text-align: center;
   box-shadow: 2px 2px 6px 0px rgba(0, 0, 0, 0.2),
     0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+`;
+
+export const MenuWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+`;
+
+const Body = styled.div`
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+`;
+
+export const Label = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+`;
+
+export const TitleWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
 `;
 
 export default App;

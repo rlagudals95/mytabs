@@ -16,10 +16,13 @@
     "wss": "node utils/reload/initReloadServer.js",
     "dev": "npm run build:hmr && (run-p wss build:watch)",
     "dev:firefox": "npm run build:hmr && (run-p wss build:firefox:watch)",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint --max-warnings=-1 \"src/**/**.ts*\"",
+    "lint:fix": "npm run lint -s -- --fix"
   },
   "type": "module",
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "antd": "^5.9.1",
