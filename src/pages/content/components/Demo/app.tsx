@@ -24,7 +24,8 @@ const App = () => {
     // 크롬 스토리지에서 데이터를 가져와서 categories 상태를 초기화합니다.
     chrome.storage.sync.get(["categories"], (result) => {
       if (result.categories) {
-        setCategories(result.categories);
+        setCategories(result?.categories);
+        setSelectedCategory(result?.categories[0]);
       }
     });
   }, []);
@@ -35,8 +36,8 @@ const App = () => {
 
   const handleOpenTabs = () => {
     if (selectedCategory) {
-      selectedCategory.urls.forEach((url) => {
-        chrome.tabs.create({ url });
+      selectedCategory.urls.map((url) => {
+        window.open(url);
       });
     }
   };
@@ -97,9 +98,9 @@ const App = () => {
     const updatedCategories = categories.map((category) =>
       category.name === categoryName
         ? {
-            name: newCategoryName,
-            urls: newCategoryUrls.split(",").map((url) => url.trim()),
-          }
+          name: newCategoryName,
+          urls: newCategoryUrls.split(",").map((url) => url.trim()),
+        }
         : category
     );
 
@@ -168,7 +169,12 @@ const App = () => {
             selectedCategory={selectedCategory}
           />
         )}
-        <Button type="primary" onClick={handleOpenTabs}>
+        <Button
+          type="primary"
+          disabled={!selectedCategory}
+          onClick={handleOpenTabs}
+          style={{ marginTop: "0.5rem" }}
+        >
           탭 열기
         </Button>
       </Body>
