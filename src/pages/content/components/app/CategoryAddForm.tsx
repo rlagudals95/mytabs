@@ -9,7 +9,7 @@ interface IProps {
   newCategory: string;
   setNewCategory: React.Dispatch<React.SetStateAction<string>>;
   newCategoryUrls: string; //@TODO - 복수형이므로 string[]
-  setNewCategoryUrls: () => void;
+  setNewCategoryUrls: React.Dispatch<React.SetStateAction<string>>;
   handleAddCategory: () => void;
 }
 

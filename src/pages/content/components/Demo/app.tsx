@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "@emotion/styled";
-import { Input, Button, Select, Modal } from "antd";
+import { Button } from "antd";
 import { MenuTitle } from "./MenuTitle";
 import { css } from "@emotion/react";
 import { ImageSquare } from "./ImageSqaure";
 import { CategoryAddForm } from "../app/CategoryAddForm";
 import { staticUrlOrigin } from "@root/src/shared/constants/url";
 import { CategoryEditForm } from "../app/CategoryEditForm";
-
-const { Option } = Select;
 
 export type Category = {
   name: string;
@@ -17,7 +15,7 @@ export type Category = {
 
 const App = () => {
   const [categories, setCategories] = useState<Category[]>([]); // 사용자가 등록한 카테고리 리스트
-  const [selectedCategory, setSelectedCategory] = useState(""); // 선택한 카테고리
+  const [selectedCategory, setSelectedCategory] = useState<Category>(); // 선택한 카테고리
   const [newCategory, setNewCategory] = useState(""); // 새 카테고리 이름
   const [newCategoryUrls, setNewCategoryUrls] = useState(""); // 새 카테고리의 URL들
   const [isButtonExpanded, setIsButtonExpanded] = useState(false);
@@ -27,19 +25,17 @@ const App = () => {
     chrome.storage.sync.get(["categories"], (result) => {
       if (result.categories) {
         setCategories(result.categories);
-
-        console.log("result.categories :", result.categories);
       }
     });
   }, []);
 
-  const handleOpenTabs = () => {
-    const selectedCategoryData = categories.find(
-      (category) => category.name === selectedCategory
-    );
+  const handleClickSetSelectedCategory = useCallback((category) => {
+    setSelectedCategory(category);
+  }, []);
 
-    if (selectedCategoryData) {
-      selectedCategoryData.urls.forEach((url) => {
+  const handleOpenTabs = () => {
+    if (selectedCategory) {
+      selectedCategory.urls.forEach((url) => {
         chrome.tabs.create({ url });
       });
     }
@@ -59,7 +55,6 @@ const App = () => {
 
     const updatedCategories = [...categories, newCategoryData];
     setCategories(updatedCategories);
-    setSelectedCategory(newCategoryData.name); // 새 카테고리를 선택하도록 설정
 
     // 크롬 스토리지에 업데이트된 카테고리 정보 저장
     chrome.storage.sync.set({ categories: updatedCategories });
@@ -146,11 +141,10 @@ const App = () => {
             newCategory={newCategory}
             setNewCategory={setNewCategory}
             newCategoryUrls={newCategoryUrls}
-            setNewCategoryUrls={handleAddCategory}
+            setNewCategoryUrls={setNewCategoryUrls}
             handleAddCategory={handleAddCategory}
           />
         )}
-
         <hr />
         <TitleWrapper>
           <MenuTitle>카테고리 목록</MenuTitle>
@@ -165,16 +159,18 @@ const App = () => {
             onClick={handleClickToggleShowCaregoryEditForm}
           />
         </TitleWrapper>
-
         {showCaregoryEditForm && (
           <CategoryEditForm
             categories={categories}
             handleEditCategory={handleEditCategory}
             handleDeleteCategory={handleDeleteCategory}
+            handleClickSetSelectedCategory={handleClickSetSelectedCategory}
+            selectedCategory={selectedCategory}
           />
         )}
-
-        <Button onClick={handleOpenTabs}>탭 열기</Button>
+        <Button type="primary" onClick={handleOpenTabs}>
+          탭 열기
+        </Button>
       </Body>
     </Wrapper>
   );
@@ -185,6 +181,7 @@ const Wrapper = styled.div`
   width: 300px;
   display: flex;
   flex-direction: column;
+  justify-content: cneter;
   position: fixed;
   top: 50px;
   right: 50px;

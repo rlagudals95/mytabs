@@ -11,7 +11,7 @@ type MergedHTMLImgAttributes = Omit<
 interface IProps extends MergedHTMLImgAttributes {
   width?: string;
   alt?: string;
-  src: string | ArrayBuffer | null;
+  src: string | null;
   background?: string;
   borderRadius?: string;
   styles?: SerializedStyles;
@@ -36,7 +36,6 @@ export const ImageSquare = ({
       {...rest}
     >
       <img
-        //@ts-ignore
         src={src}
         alt={alt}
         style={{
