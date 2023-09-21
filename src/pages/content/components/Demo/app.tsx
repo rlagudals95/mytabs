@@ -121,83 +121,109 @@ const App = () => {
     setShowCaregoryEditForm(!showCaregoryEditForm);
   }, [showCaregoryEditForm]);
 
+  const [expanedBody, setExpandBody] = useState(false);
+
+  const handleClickToggleBody = useCallback(() => {
+    setExpandBody(!expanedBody);
+  }, [setExpandBody, expanedBody]);
+
   return (
     <Wrapper>
-      <Body>
-        <TitleWrapper>
-          <MenuTitle>카테고리 추가</MenuTitle>
-          <ImageSquare
-            src={`${staticUrlOrigin}/olaf/assets/images/toggle_down.svg`}
-            width="2.2rem"
-            styles={css`
-              cursor: pointer;
-              transition: 0.2s;
-              transform: rotate(${showCaregoryAddForm ? 0 : 180}deg);
-            `}
-            onClick={handleClickToggleShowCaregoryAddForm}
-          />
-        </TitleWrapper>
-        {showCaregoryAddForm && (
-          <CategoryAddForm
-            newCategory={newCategory}
-            setNewCategory={setNewCategory}
-            newCategoryUrls={newCategoryUrls}
-            setNewCategoryUrls={setNewCategoryUrls}
-            handleAddCategory={handleAddCategory}
-          />
-        )}
-        <hr />
-        <TitleWrapper>
-          <MenuTitle>카테고리 목록</MenuTitle>
-          <ImageSquare
-            src={`${staticUrlOrigin}/olaf/assets/images/toggle_down.svg`}
-            width="2.2rem"
-            styles={css`
-              cursor: pointer;
-              transition: 0.2s;
-              transform: rotate(${showCaregoryEditForm ? 0 : 180}deg);
-            `}
-            onClick={handleClickToggleShowCaregoryEditForm}
-          />
-        </TitleWrapper>
-        {showCaregoryEditForm && (
-          <CategoryEditForm
-            categories={categories}
-            handleEditCategory={handleEditCategory}
-            handleDeleteCategory={handleDeleteCategory}
-            handleClickSetSelectedCategory={handleClickSetSelectedCategory}
-            selectedCategory={selectedCategory}
-          />
-        )}
-        <Button
-          type="primary"
-          disabled={!selectedCategory}
-          onClick={handleOpenTabs}
-          style={{ marginTop: "0.5rem" }}
-        >
-          탭 열기
-        </Button>
-      </Body>
+      {!expanedBody && (
+        <InitialWrapper onClick={handleClickToggleBody}>열기</InitialWrapper>
+      )}
+      {expanedBody && (
+        <Body>
+          <CloseButton onClick={handleClickToggleBody}>
+            <ImageSquare
+              src={`${staticUrlOrigin}/olaf/assets/images/close.svg`}
+              width="1.8rem"
+              background="transparent"
+            />
+          </CloseButton>
+          <TitleWrapper>
+            <MenuTitle>카테고리 추가</MenuTitle>
+            <ImageSquare
+              src={`${staticUrlOrigin}/olaf/assets/images/toggle_down.svg`}
+              width="2.2rem"
+              styles={css`
+                cursor: pointer;
+                transition: 0.2s;
+                transform: rotate(${showCaregoryAddForm ? 0 : 180}deg);
+              `}
+              onClick={handleClickToggleShowCaregoryAddForm}
+            />
+          </TitleWrapper>
+          {showCaregoryAddForm && (
+            <CategoryAddForm
+              newCategory={newCategory}
+              setNewCategory={setNewCategory}
+              newCategoryUrls={newCategoryUrls}
+              setNewCategoryUrls={setNewCategoryUrls}
+              handleAddCategory={handleAddCategory}
+            />
+          )}
+          <hr />
+          <TitleWrapper>
+            <MenuTitle>카테고리 목록</MenuTitle>
+            <ImageSquare
+              src={`${staticUrlOrigin}/olaf/assets/images/toggle_down.svg`}
+              width="2.2rem"
+              styles={css`
+                cursor: pointer;
+                transition: 0.2s;
+                transform: rotate(${showCaregoryEditForm ? 0 : 180}deg);
+              `}
+              onClick={handleClickToggleShowCaregoryEditForm}
+            />
+          </TitleWrapper>
+          {showCaregoryEditForm && (
+            <CategoryEditForm
+              categories={categories}
+              handleEditCategory={handleEditCategory}
+              handleDeleteCategory={handleDeleteCategory}
+              handleClickSetSelectedCategory={handleClickSetSelectedCategory}
+              selectedCategory={selectedCategory}
+            />
+          )}
+          <Button
+            type="primary"
+            disabled={!selectedCategory}
+            onClick={handleOpenTabs}
+            style={{ marginTop: "0.5rem" }}
+          >
+            탭 열기
+          </Button>
+        </Body>
+      )}
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
   background: #fff;
-  width: 300px;
+  width: fit-content;
   display: flex;
   flex-direction: column;
-  justify-content: cneter;
+  justify-content: center;
   position: fixed;
   top: 50px;
   right: 50px;
   z-index: 9999;
-  padding: 1rem;
+  padding: 0rem;
   border-radius: 0.5rem;
   font-weight: 500;
   text-align: center;
   box-shadow: 2px 2px 6px 0px rgba(0, 0, 0, 0.2),
     0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: -0.6rem;
+  right: 0;
+  border: none;
+  background: transparent;
 `;
 
 export const MenuWrapper = styled.div`
@@ -210,7 +236,9 @@ const Body = styled.div`
   margin-top: 1rem;
   display: flex;
   flex-direction: column;
+  position: relative;
   gap: 0.5rem;
+  padding: 1rem;
 `;
 
 export const InputWrapper = styled.div`
@@ -230,6 +258,18 @@ export const TitleWrapper = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+`;
+
+const InitialWrapper = styled.div`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0px 0px 0.5rem 0px rgba(0, 0, 0, 0.06),
+    0px 0px 0.5rem 0px rgba(0, 0, 0, 0.08);
 `;
 
 export default App;

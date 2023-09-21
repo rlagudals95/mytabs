@@ -21,6 +21,12 @@ export const CategoryEditForm = ({
 }: IProps) => {
   return (
     <Wrapper>
+      {categories.length === 0 && (
+        <EmptyCategory>
+          등록된 url 카테고리가 없습니다. <br /> 위의 추가 메뉴를 이용해
+          추가해주세요 :)
+        </EmptyCategory>
+      )}
       {categories.map((category) => {
         const isSelectedCategory =
           selectedCategory && category.name === selectedCategory.name;
@@ -129,4 +135,9 @@ const CategoryRight = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: center;
+`;
+
+const EmptyCategory = styled.p`
+  color: ${COLOR.GRAY};
+  font-size: 0.8rem;
 `;
